@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-from __future__ import division
+
 """
 network.py
 ~~~~~~~~~~
@@ -88,7 +88,6 @@ class Network(object):
         for x, y in mini_batch:
             # 根据样本中的每一个输入 x 的其输出 y，计算 w 和 b 的偏导数
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
-            
             # 累加储存偏导值 delta_nabla_b 和 delta_nabla_w
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
@@ -101,8 +100,8 @@ class Network(object):
 
     def backprop(self, x, y):
         """
-        :param x: input 4
-        :param y: output
+        :param x:
+        :param y:
         :return:
         """
         nabla_b = [np.zeros(b.shape) for b in self.biases]
@@ -148,8 +147,6 @@ class Network(object):
         :param y:
         :return:
         """
-#        print output_activations
-#        print y
         return (output_activations-y)
 
 #### Miscellaneous functions
@@ -168,24 +165,3 @@ def sigmoid_prime(z):
     :return:
     """
     return sigmoid(z)*(1-sigmoid(z))
-
-def relu(y):
-    tmp = y.copy()
-    tmp[tmp < 0] = 0
-    return tmp
-
-def drelu(x):
-    tmp = x.copy()
-    tmp[tmp >= 0] = 1
-    tmp[tmp < 0] = 0
-    return tmp
-
-
-network = Network([4, 100, 4])
-import loader
-training_data, validation_data, test_data = loader.load_data_wrapper()
-train2, test2, train_v = loader.createDataSet()
-
-#network.SGD(train2, 3000, 1, 0.5, test_data = test2)
-
-network.SGD(train2, 100, 5, 0.01, test_data = train_v)
