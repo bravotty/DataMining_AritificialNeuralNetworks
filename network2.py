@@ -1,23 +1,8 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 from __future__ import division
-"""
-network.py
-~~~~~~~~~~
-
-A module to implement the stochastic gradient descent learning
-algorithm for a feedforward neural network.  Gradients are calculated
-using backpropagation.  Note that I have focused on making the code
-simple, easily readable, and easily modifiable.  It is not optimized,
-and omits many desirable features.
-"""
-
-#### Libraries
-# Standard library
 import random
-
-# Third-party libraries
 import numpy as np
+import tools as tl
 
 class Network(object):
 
@@ -182,10 +167,5 @@ def drelu(x):
 
 
 network = Network([4, 100, 4])
-import loader
-training_data, validation_data, test_data = loader.load_data_wrapper()
-train2, test2, train_v = loader.createDataSet()
-
-#network.SGD(train2, 3000, 1, 0.5, test_data = test2)
-
+train2, test2, train_v = tl.createDataSet()
 network.SGD(train2, 100, 5, 0.01, test_data = train_v)
