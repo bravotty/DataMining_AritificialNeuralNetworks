@@ -35,6 +35,55 @@ def createDataSet(splitSize=0.2):
     recordNums = numpyTrainData.shape[0]
     trainDataIndex = range(recordNums)
     #train_data_index = [1, ..., 59]
+#     testDataIndex = []
+#     testNumber = int(recordNums * splitSize)
+#     for i in range(testNumber):
+#     	#choose test_number test e.g.s
+#     	randomNum = int(np.random.uniform(0, len(trainDataIndex)))
+#     	testDataIndex.append(trainDataIndex[randomNum])
+#     	del trainDataIndex[randomNum]
+    
+#     trainSet = numpyTrainData[trainDataIndex]
+#     testSet  = numpyTrainData[testDataIndex]
+#     testlabel  = [a[-1] for a in testSet]
+#     trainlabel = [a[-1] for a in trainSet]
+#     training_data = numpyTrainData2[trainDataIndex]
+#     test_data = numpyTrainData2[testDataIndex]
+# #    print training_data
+#     for i in range(len(training_data[0])):
+#         temp = [a[i] for a in training_data]
+#         maxNumber = max(temp)
+#         minNumber = min(temp)
+#         #standardize the dataSet
+#         for j in range(len(training_data)):
+#             denominator = maxNumber - minNumber
+#             training_data[j][i] = (training_data[j][i] - minNumber) / denominator
+# #    print training_data
+            
+#     trainSet = [np.reshape(a, (4, 1)) for a in training_data]
+#     for i in range(len(trainlabel)):
+#         trainlabel[i] = int(trainlabel[i])
+#         trainlabel[i] -= 1
+#     train2 = zip(trainSet, trainlabel)
+#     print train2
+
+    
+#     trainL = [vectorized(int(y)) for y in trainlabel]
+#     training_data = zip(trainSet, trainL)
+# #    print training_data
+#     testSet = [np.reshape(a, (4, 1)) for a in test_data]
+    
+#     for i in range(len(testlabel)):
+#         testlabel[i] = int(testlabel[i])
+#         testlabel[i] -= 1
+# #        print testlabel[i]
+#     test_data = zip(testSet, testlabel)
+# #    trainSet = trainSet.tolist()
+# #    testSet  = testSet.tolist()
+
+#    trainLabel = [a[-1]  for a in trainSet]
+#    trainSet   = [a[:-1] for a in trainSet]
+#    testSet    = [a[:-1] for a in testSet]
     testDataIndex = []
     testNumber = int(recordNums * splitSize)
     for i in range(testNumber):
@@ -42,50 +91,22 @@ def createDataSet(splitSize=0.2):
     	randomNum = int(np.random.uniform(0, len(trainDataIndex)))
     	testDataIndex.append(trainDataIndex[randomNum])
     	del trainDataIndex[randomNum]
-    
     trainSet = numpyTrainData[trainDataIndex]
     testSet  = numpyTrainData[testDataIndex]
-    testlabel  = [a[-1] for a in testSet]
-    trainlabel = [a[-1] for a in trainSet]
-    training_data = numpyTrainData2[trainDataIndex]
-    test_data = numpyTrainData2[testDataIndex]
-#    print training_data
-    for i in range(len(training_data[0])):
-        temp = [a[i] for a in training_data]
-        maxNumber = max(temp)
-        minNumber = min(temp)
-        #standardize the dataSet
-        for j in range(len(training_data)):
-            denominator = maxNumber - minNumber
-            training_data[j][i] = (training_data[j][i] - minNumber) / denominator
-#    print training_data
-            
-    trainSet = [np.reshape(a, (4, 1)) for a in training_data]
-    for i in range(len(trainlabel)):
-        trainlabel[i] = int(trainlabel[i])
-        trainlabel[i] -= 1
-    train2 = zip(trainSet, trainlabel)
-    print train2
+    # trainSet = trainSet.tolist()
+    # testSet  = testSet.tolist()
 
-    
-    trainL = [vectorized(int(y)) for y in trainlabel]
-    training_data = zip(trainSet, trainL)
-#    print training_data
-    testSet = [np.reshape(a, (4, 1)) for a in test_data]
-    
-    for i in range(len(testlabel)):
-        testlabel[i] = int(testlabel[i])
-        testlabel[i] -= 1
-#        print testlabel[i]
-    test_data = zip(testSet, testlabel)
-#    trainSet = trainSet.tolist()
-#    testSet  = testSet.tolist()
-
-#    trainLabel = [a[-1]  for a in trainSet]
-#    trainSet   = [a[:-1] for a in trainSet]
-#    testSet    = [a[:-1] for a in testSet]
+    trainLabel = [a[-1]  for a in trainSet]
+    trainSet   = [a[:-1] for a in trainSet]
+    testLabel  = [a[-1]  for a in testSet]
+    testSet    = [a[:-1] for a in testSet]
     # print testSet
     # print testlabel
-    return training_data, test_data, train2
+    trainLabel = np.array(trainLabel)
+    trainSet   = np.array(trainSet)
+    testLabel  = np.array(testLabel)
+    testSet    = np.array(testSet)
+    
+    return trainSet, trainLabel, testSet, testLabel
 
-trainSet, testSet, _ = createDataSet()
+trainSet, testSet, _ , i = createDataSet()
