@@ -11,12 +11,12 @@ import tools as tl
 class AritificialNeuralNetworks(object):
 	def __init__(self, layers, learningRate, trainX, trainY, epoch):
 		#input params
-		self.layers = layers
-		self.lr     = learningRate
-		self.trainX = self.dataNormalization(trainX)
-		self.trainY = self.onHotDataProcessing(trainY)
+		self.layers  = layers
+		self.lr      = learningRate
+		self.trainX  = self.dataNormalization(trainX)
+		self.trainY  = self.onHotDataProcessing(trainY)
 		# self.trainY = trainY
-		self.epoch  = epoch
+		self.epoch   = epoch
 		self.weights = [np.random.uniform(-1, 1, [y, x]) for x, y in zip(layers[:-1], layers[1:])]
 		self.biases  = [np.zeros([y, 1]) for y in layers[1:]]
 		# a = np.array(self.weights)
