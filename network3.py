@@ -16,9 +16,9 @@ def load_data():
     test_y=dataset[0:devide,0]
     train_y=dataset[devide:,0]
     print test_x
-    print test_y
-    print train_x
-    print train_y
+    # print test_y
+    # print train_x
+    # print train_y
     return train_x,train_y,test_x,test_y
 
 
@@ -114,7 +114,7 @@ class ANN:
         self.y=self.oneHot(y)
         self.frequency=frequency
         for i,j in layers[1:],layers[:-1]:
-            
+            print i, j
             layer_weight=np.random.uniform(-0.2,0.2,[i,j])
             layer_bias=np.random.uniform(-0.2,0.2,[i,1])
             self.weight.append(layer_weight)
@@ -128,9 +128,9 @@ class ANN:
 def main():
     train_x,train_y,test_x,test_y=load_data()
     clt=ANN()
-    clt.buildModle([4,4,4],0.5,train_x,train_y,1000)
-    accuracy=clt.evaluate(train_x,train_y)
-    print(accuracy)
+    clt.buildModle([4,4,4],0.5,train_x,train_y,1)
+    # accuracy=clt.evaluate(train_x,train_y)
+    # print(accuracy)
 
 if __name__=='__main__':
     main()
