@@ -28,16 +28,34 @@ class AritificialNeuralNetworks(object):
 			for trainX, trainY in zip(self.trainX, self.trainY):
 				# 2 step to train the network
 				# 1.forwardUpdate the network params
-				netLayerInput, netLayerOuput = forwardUpdate(trainX)
+				netLayerInput, netLayerOuput = self.forwardUpdate(trainX)
 				# 2. backForwardUpdata the network params
 				self.backForwardUpdate(netLayerInput, netLayerOuput, trainY)
 
 
-	def forwardUpdate():
-		pass
+	def forwardUpdate(self, trainX):
+		d = trainX
+		layerOutput = []
+		layerInput  = []
+		
+		for layer in range(len(self.layers) - 1):
+			layerInput.append(d)
+			
+			print self.weights[layer].T.shape
+			d = np.dot(d, self.weights[layer].T) + self.biases[layer]
+			d = [self.sigmoid(i) for i in d]
+			layerOutput.append(d)
+		return layerInput, layerOutput
+		
+
+
 
 	def backForwardUpdate():
 		pass
+
+	def sigmoid(self, inputX):
+		return [ 1 / (1 + np.math.exp(-i)) for i in inputX]
+
 
 	def dataNormalization(self, trainX):
 		#reverse the trainX [40,4]->[4->40]
@@ -68,7 +86,7 @@ class AritificialNeuralNetworks(object):
 
 def AritificialNeuralNetworksModelMain():
 	train, trainy, test, testy = tl.createDataSet()
-	ANNModel = AritificialNeuralNetworks([4, 6, 8, 4], 0.1, train, trainy, 1000)
+	ANNModel = AritificialNeuralNetworks([4, 6, 4], 0.1, train, trainy, 1000)
 	ANNModel.fitTransform()
 
 
