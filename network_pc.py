@@ -13,24 +13,32 @@ class AritificialNeuralNetworks(object):
         # input params
         self.layers   = layers
         self.lr       = learningRate
+        self.epoch    = epoch
+
+        # cal the mean and std
+        self.mean     = [np.mean(i) for i in trainX.T]
+        self.stdVar   = [np.std(i)  for i in trainX.T]
+
+        self.trainXPrediction = trainX
+        self.trainYPrediction = trainY
+
         self.trainX   = self.dataNormalization(trainX)
+        # print len(trainX)
         self.trainY   = self.onHotDataProcessing(trainY)
         # self.trainY = trainY
-        self.epoch    = epoch
         self.weights  = [np.random.uniform(-1, 1, [y, x]) for x, y in zip(layers[:-1], layers[1:])]
         self.biases   = [np.zeros([y, 1]) for y in layers[1:]]
+        # self.biases   = [np.random.uniform(-0.2, 0.2, [y, 1]) for y in layers[1:]]
         # print self.weights[0]
         self.cntLayer = len(self.layers) - 1
         self.error    = None
-        self.mean     = None
-        self.stdVar   = None
 
     # a = np.array(self.weights)
     # b = np.array(self.biases)
     # print a.shape
 
     def fitTransform(self):
-        for i in xrange(self.epoch):
+        for i in range(self.epoch):
             for trainX, trainY in zip(self.trainX, self.trainY):
                 # 2 step to train the network
                 # 1.forwardUpdate the network params
@@ -38,13 +46,15 @@ class AritificialNeuralNetworks(object):
                 # 2. backForwardUpdata the network params
                 self.backForwardUpdate(netLayerInput, netLayerOuput, trainY)
 
+            print ("Epoch {0}: {1} / {2}".format(i, self.prediction(testX=self.trainXPrediction,\
+                                                    testY=self.trainYPrediction)[1], 48))
+
     def forwardUpdate(self, trainX):
         d = trainX
         layerOutput = []
         layerInput  = []
         for layer in range(len(self.layers) - 1):
             layerInput.append(d)
-
             d = np.dot(d, self.weights[layer].T) + self.biases[layer].T
             d = [self.sigmoid(i) for i in d]
             layerOutput.append(d)
@@ -52,20 +62,24 @@ class AritificialNeuralNetworks(object):
 
     def backForwardUpdate(self, netLayerInput, netLayerOutput, trainY):
         trainY = np.array(trainY)
-        for idx,output,in_put in zip(range(self.cntLayer)[ : : -1],\
-                                     netLayerOutput[ : : -1],netLayerInput[ : : -1]):
-            output = np.array(output)
-            in_put = np.array(in_put)
-            if idx == (self.cntLayer - 1):
-                #cal the error of y
-                self.error = output * (1 - output) * (trainY - output)
-            else:
-                self.error = np.dot(self.error, self.weights[idx].T)
-                self.error = output * (1 - output ) * self.error
+        #reverse the order to cal the gradient
+        for layerIndex, netInput, netOutput in zip(range(self.cntLayer)[ : : -1],\
+                                     netLayerInput[ : : -1], netLayerOutput[ : : -1]):
+            netIn  = np.array(netInput)
+            netOut = np.array(netOutput)
 
-            for n in range(len(self.weights[idx])):
-                self.weights[idx][n] = self.weights[idx][n] + self.lr * self.error[0][n] + in_put
-                self.biases[idx] = (self.biases[idx].T + self.lr * self.error).T
+            if layerIndex == (self.cntLayer - 1):
+                #cal the error of y
+                self.error = netOut * (1 - netOut) * (trainY - netOut)
+            else:
+                #update the error of hidden layer
+                self.error = np.dot(self.error, self.weights[layerIndex + 1])
+                self.error = netOut * (1 - netOut) * self.error
+
+            for n in range(len(self.weights[layerIndex])):
+                self.weights[layerIndex][n] = self.weights[layerIndex][n] + self.lr * self.error[0][n] * netIn
+                self.biases[layerIndex] = (self.biases[layerIndex].T + self.lr * self.error).T
+
 
     #
     def sigmoid(self, inputX):
@@ -75,8 +89,6 @@ class AritificialNeuralNetworks(object):
         # reverse the trainX [40,4]->[4->40]
         # print data.shape
         data = trainX.T
-        self.mean = [np.mean(i) for i in data]
-        self.stdVar = [np.std(i) for i in data]
         for i in range(len(data)):
             data[i] = (data[i] - self.mean[i]) / self.stdVar[i]
         return data.T
@@ -100,8 +112,13 @@ class AritificialNeuralNetworks(object):
         res = 0
         result = []
         testX = np.array(testX).T
-        for i in xrange(len(testX)):
-            testX = (testX[i]- self.means[i]) / self.stdVar[i]
+        # print (self.mean)
+        mean   = [np.mean(i) for i in testX]
+        stdVar = [np.std(i) for i in testX]
+        for i in range(len(testX)):
+            # use trainSet mean std or testSet mean std
+            # testX[i] = (testX[i]- self.mean[i]) / self.stdVar[i]
+            testX[i] = (testX[i] - mean[i]) / stdVar[i]
         testX = testX.T
         for tX in testX:
             tmp = tX
@@ -113,12 +130,15 @@ class AritificialNeuralNetworks(object):
             if realY == predY:
                 res += 1
         accuracy = res / len(testY)
-        return  accuracy
+
+        return  accuracy, res
 
 def AritificialNeuralNetworksModelMain():
     train, trainy, test, testy = tl.createDataSet()
-    ANNModel = AritificialNeuralNetworks([4, 6, 4], 0.1, train, trainy, 10)
+    ANNModel = AritificialNeuralNetworks([4, 100, 100, 40, 4], 0.1, train, trainy, 300)
     ANNModel.fitTransform()
+    accuracy = ANNModel.prediction(train, trainy)[0]
+    print (accuracy)
 
 
 if __name__ == '__main__':
