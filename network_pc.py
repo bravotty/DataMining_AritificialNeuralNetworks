@@ -22,7 +22,8 @@ class AritificialNeuralNetworks(object):
         # print self.weights[0]
         self.cntLayer = len(self.layers) - 1
         self.error    = None
-        self.stdVar   = [np.std(i)  for i in self.trainX.T]
+        self.mean     = None
+        self.stdVar   = None
 
     # a = np.array(self.weights)
     # b = np.array(self.biases)
@@ -40,7 +41,7 @@ class AritificialNeuralNetworks(object):
     def forwardUpdate(self, trainX):
         d = trainX
         layerOutput = []
-        layerInput = []
+        layerInput  = []
         for layer in range(len(self.layers) - 1):
             layerInput.append(d)
 
@@ -74,8 +75,10 @@ class AritificialNeuralNetworks(object):
         # reverse the trainX [40,4]->[4->40]
         # print data.shape
         data = trainX.T
+        self.mean = [np.mean(i) for i in data]
+        self.stdVar = [np.std(i) for i in data]
         for i in range(len(data)):
-            data[i] = (data[i] - self.means[i]) / self.stdVar[i]
+            data[i] = (data[i] - self.mean[i]) / self.stdVar[i]
         return data.T
 
     def onHotDataProcessing(self, trainY):
@@ -114,7 +117,7 @@ class AritificialNeuralNetworks(object):
 
 def AritificialNeuralNetworksModelMain():
     train, trainy, test, testy = tl.createDataSet()
-    ANNModel = AritificialNeuralNetworks([4, 6, 4], 0.1, train, trainy, 1000)
+    ANNModel = AritificialNeuralNetworks([4, 6, 4], 0.1, train, trainy, 10)
     ANNModel.fitTransform()
 
 
