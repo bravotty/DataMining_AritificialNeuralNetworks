@@ -9,7 +9,7 @@ import tools as tl
 
 
 class AritificialNeuralNetworks(object):
-    def __init__(self, layers, learningRate, trainX, trainY, epoch):
+    def __init__(self, layers, learningRate, trainX, trainY, testX, testY, epoch):
         # input params
         self.layers   = layers
         self.lr       = learningRate
@@ -21,7 +21,8 @@ class AritificialNeuralNetworks(object):
 
         self.trainXPrediction = trainX
         self.trainYPrediction = trainY
-
+        self.testXPrediction  = testX
+        self.testYPrediction  = testY
         self.trainX   = self.dataNormalization(trainX)
         # print len(trainX)
         self.trainY   = self.onHotDataProcessing(trainY)
@@ -46,8 +47,8 @@ class AritificialNeuralNetworks(object):
                 # 2. backForwardUpdata the network params
                 self.backForwardUpdate(netLayerInput, netLayerOuput, trainY)
 
-            print ("Epoch {0}: {1} / {2}".format(i, self.prediction(testX=self.trainXPrediction,\
-                                                    testY=self.trainYPrediction)[1], 48))
+            print ("Epoch {0}: {1} / {2}".format(i, self.prediction(testX=self.testXPrediction,\
+                                                    testY=self.testYPrediction)[1], 11))
 
     def forwardUpdate(self, trainX):
         d = trainX
@@ -70,7 +71,8 @@ class AritificialNeuralNetworks(object):
 
             if layerIndex == (self.cntLayer - 1):
                 #cal the error of y
-                self.error = netOut * (1 - netOut) * (trainY - netOut)
+                self.error = netOut * (1 - netOut) * self.costFunction(realY=trainY,\
+                                                                       inputY=netOut)
             else:
                 #update the error of hidden layer
                 self.error = np.dot(self.error, self.weights[layerIndex + 1])
@@ -84,6 +86,9 @@ class AritificialNeuralNetworks(object):
     #
     def sigmoid(self, inputX):
         return [1 / (1 + np.math.exp(-i)) for i in inputX]
+
+    def costFunction(self, realY, inputY):
+        return (realY - inputY)
 
     def dataNormalization(self, trainX):
         # reverse the trainX [40,4]->[4->40]
@@ -135,10 +140,14 @@ class AritificialNeuralNetworks(object):
 
 def AritificialNeuralNetworksModelMain():
     train, trainy, test, testy = tl.createDataSet()
-    ANNModel = AritificialNeuralNetworks([4, 100, 100, 40, 4], 0.1, train, trainy, 300)
+    # layers, learningRate, trainX, trainY, testX, testY, epoch
+    ANNModel = AritificialNeuralNetworks(layers=[4, 100, 100, 4], learningRate=0.1, trainX=train,\
+                                         trainY=trainy, testX=test, testY=testy, epoch = 300)
+    # fit the model with training data
     ANNModel.fitTransform()
-    accuracy = ANNModel.prediction(train, trainy)[0]
-    print (accuracy)
+    # cal the accuracy
+    accuracy = ANNModel.prediction(testX=test, testY=testy)[0]
+    print ("The accuracy of the test dataSet :  " + str(accuracy))
 
 
 if __name__ == '__main__':
