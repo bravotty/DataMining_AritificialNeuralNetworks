@@ -11,7 +11,7 @@ import tools as tl
 class AritificialNeuralNetworks(object):
     def __init__(self, layers, learningRate, trainX, trainY, testX, testY, epoch):
         # input params
-        self.layers   = layers
+        self.layers   = layers 
         self.lr       = learningRate
         self.epoch    = epoch
 
@@ -23,12 +23,11 @@ class AritificialNeuralNetworks(object):
         self.trainYPrediction = trainY
         self.testXPrediction  = testX
         self.testYPrediction  = testY
-
+        #process the trainX data and trainY data
         self.trainX   = self.dataNormalization(trainX)
-        # print len(trainX)
         self.trainY   = self.onHotDataProcessing(trainY)
         # self.trainY = trainY
-        self.weights  = [np.random.uniform(-1, 1, [y, x]) for x, y in zip(layers[:-1], layers[1:])]
+        self.weights  = [np.random.uniform(-0.5, 0.5, [y, x]) for x, y in zip(layers[:-1], layers[1:])]
         self.biases   = [np.zeros([y, 1]) for y in layers[1:]]
         # self.biases   = [np.random.uniform(-1, 1, [y, 1]) for y in layers[1:]]
         # print self.weights[0]
@@ -44,23 +43,24 @@ class AritificialNeuralNetworks(object):
                 netLayerInput, netLayerOuput = self.forwardUpdate(trainX)
                 # 2. backForwardUpdata the network params
                 self.backForwardUpdate(netLayerInput, netLayerOuput, trainY)
-            # !! print every epoch TrainSet OR TestSet Accuracy !!
-            # print ("Epoch {0} trainSet accuracy: {1} / {2}".format(i, self.prediction(testX=self.trainXPrediction,\
-                                                    # testY=self.trainYPrediction)[1], len(self.trainXPrediction)))
-            print ("Epoch {0} testSet accuracy: {1} / {2}".format(i, self.prediction(testX=self.testXPrediction,\
-                                                    testY=self.testYPrediction)[1], len(self.testXPrediction)))
+            # * print every epoch TrainSet OR TestSet Accuracy *
+            print ("Epoch {0} : testSet accuracy: {1} / {2}   |   trainSet accuracy: {3} / {4}".\
+                format(i, self.prediction(testX=self.testXPrediction,testY=self.testYPrediction)[1], len(self.testXPrediction),\
+                    self.prediction(testX=self.trainXPrediction,testY=self.trainYPrediction)[1],len(self.trainXPrediction)))
 
     def forwardUpdate(self, trainX):
         tmpTrain = trainX
         layerOutput = []
         layerInput  = []
         # forward update 
-        for layer in range(len(self.layers) - 1):
+        for layer in range(self.cntLayer):
             layerInput.append(tmpTrain)
             # cal the train value
             tmpTrain = np.dot(tmpTrain, self.weights[layer].T) + self.biases[layer].T
             # activate the train value - sigmoid
             tmpTrain = [self.sigmoid(i) for i in tmpTrain]
+            # tmpTrain = [self.ReLU(i) for i in tmpTrain]
+            # tmpTrain = [self.tanh(i) for i in tmpTrain]
             layerOutput.append(tmpTrain)
         return layerInput, layerOutput
 
@@ -76,18 +76,26 @@ class AritificialNeuralNetworks(object):
                 # cal the error of y - last layer
                 self.error = self.sigmoidPrime(netOut) * self.costFunction(realY=trainY,\
                                                                        inputY=netOut)
+                # self.error = self.ReLUPrime(netOut) * self.costFunction(realY=trainY,\
+                #                                                       inputY=netOut)
+                # self.error = self.tanhPrime(netOut) * self.costFunction(realY=trainY,\
+                #                                                       inputY=netOut)                
             else:
                 # update the error of hidden layer 
                 # "layerIndex + 1" index the behind layer
                 self.error = np.dot(self.error, self.weights[layerIndex + 1])
                 self.error = self.sigmoidPrime(netOut) * self.error
+                # self.error = self.ReLUPrime(netOut) * self.error
+                # self.error = self.tanhPrime(netOut) * self.error
+
             # !! extract the No.2 Axis of error -- Error of every layer !!
             self.error = self.error[0]
             for n in range(len(self.weights[layerIndex])):
                 self.weights[layerIndex][n] = self.weights[layerIndex][n] + netIn * self.lr * self.error[n]
                 self.biases[layerIndex] = (self.biases[layerIndex].T + self.lr * self.error).T
 
-
+    #-----------------------------------------------
+    #----- Activation function and its prime format
     def sigmoid(self, inputX):
         return [1 / (1 + np.math.exp(-i)) for i in inputX]
 
@@ -110,10 +118,15 @@ class AritificialNeuralNetworks(object):
         outputYReLU[outputYReLU >= 0] = 1
         outputYReLU[outputYReLU <  0] = 0
         return outputYReLU
+    #---End of the activation function
+    #-----------------------------------------------
 
+    # cost function / loss function
     def costFunction(self, realY, inputY):
         return (realY - inputY)
 
+    # input params  : trainSet X
+    # output params : (X - mean(X)) / std(X)
     def dataNormalization(self, trainX):
         # reverse the trainX [40,4]->[4->40]
         # print data.shape
@@ -122,6 +135,8 @@ class AritificialNeuralNetworks(object):
             data[i] = (data[i] - self.mean[i]) / self.stdVar[i]
         return data.T
 
+    # input params  : trainSet Y
+    # output params : ont hot  Y e.g.[3] = [0, 0, 1, 0], [4] = [0, 0, 0, 1]
     def onHotDataProcessing(self, trainY):
         res = []
         # lenght of onehot data is self.layers[-1]
@@ -154,19 +169,20 @@ class AritificialNeuralNetworks(object):
             for layer in range(self.cntLayer):
                 tmp = np.dot(tmp, self.weights[layer].T) + self.biases[layer].T
                 tmp = [self.sigmoid(i) for i in tmp]
+                # tmp = [self.ReLU(i) for i in tmp]
+                # tmp = [self.tanh(i) for i in tmp]
             result.append(np.argmax(tmp) + 1)
         for realY, predY in zip(testY, result):
             if realY == predY:
                 res += 1
         accuracy = res / len(testY)
-
         return  accuracy, res
 
 def AritificialNeuralNetworksModelMain():
     train, trainy, test, testy = tl.createDataSet()
     # layers, learningRate, trainX, trainY, testX, testY, epoch
-    ANNModel = AritificialNeuralNetworks(layers=[4, 100, 4], learningRate=0.1, trainX=train,\
-                                         trainY=trainy, testX=test, testY=testy, epoch = 600)
+    ANNModel = AritificialNeuralNetworks(layers=[4, 150, 4], learningRate=0.1, trainX=train,\
+                                         trainY=trainy, testX=test, testY=testy, epoch = 500)
     # fit the model with training data
     ANNModel.fitTransform()
     # cal the accuracy
@@ -175,3 +191,4 @@ def AritificialNeuralNetworksModelMain():
 
 if __name__ == '__main__':
     AritificialNeuralNetworksModelMain()
+
