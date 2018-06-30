@@ -29,7 +29,7 @@ class AritificialNeuralNetworks(object):
         # self.trainY = trainY
         self.weights  = [np.random.uniform(-1, 1, [y, x]) for x, y in zip(layers[:-1], layers[1:])]
         self.biases   = [np.zeros([y, 1]) for y in layers[1:]]
-        # self.biases   = [np.random.uniform(-0.2, 0.2, [y, 1]) for y in layers[1:]]
+        # self.biases   = [np.random.uniform(-1, 1, [y, 1]) for y in layers[1:]]
         # print self.weights[0]
         self.cntLayer = len(self.layers) - 1
         self.error    = None
@@ -83,7 +83,7 @@ class AritificialNeuralNetworks(object):
                 self.biases[layerIndex] = (self.biases[layerIndex].T + self.lr * self.error).T
 
 
-    #
+    
     def sigmoid(self, inputX):
         return [1 / (1 + np.math.exp(-i)) for i in inputX]
 
