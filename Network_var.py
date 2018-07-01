@@ -15,7 +15,7 @@ class AritificialNeuralNetworks(object):
         self.epoch    = epoch
         # cal the mean and std
         self.mean     = [np.mean(i) for i in trainX.T]
-        self.stdVar   = [np.std(i)  for i in trainX.T]
+        self.stdVar   = [np.var(i)  for i in trainX.T]
         # for epoch show
         self.trainXPrediction = trainX
         self.trainYPrediction = trainY
@@ -42,8 +42,8 @@ class AritificialNeuralNetworks(object):
                 self.backForwardUpdate(netLayerInput, netLayerOuput, trainY)
             # * print every epoch TrainSet OR TestSet Accuracy *
             print ("Epoch {0} : testSet accuracy: {1} / {2}   |   trainSet accuracy: {3} / {4}".\
-                format(i, self.prediction(testX=self.testXPrediction, testY=self.testYPrediction)[1], len(self.testXPrediction),\
-                    self.prediction(testX=self.trainXPrediction, testY=self.trainYPrediction)[1], len(self.trainXPrediction)))
+                format(i, self.prediction(testX=self.testXPrediction,testY=self.testYPrediction)[1], len(self.testXPrediction),\
+                    self.prediction(testX=self.trainXPrediction,testY=self.trainYPrediction)[1],len(self.trainXPrediction)))
 
     def forwardUpdate(self, trainX):
         tmpTrain = trainX
@@ -87,7 +87,6 @@ class AritificialNeuralNetworks(object):
 
             # !! extract the No.2 Axis of error -- Error of each layer !!
             self.error = self.error[0]
-            #update the weights and biases
             for n in range(len(self.weights[layerIndex])):
                 self.weights[layerIndex][n] = self.weights[layerIndex][n] + netIn * self.lr * self.error[n]
                 self.biases[layerIndex] = (self.biases[layerIndex].T + self.lr * self.error).T
@@ -156,7 +155,7 @@ class AritificialNeuralNetworks(object):
         testX = np.array(testX).T
         # print (self.mean)
         mean   = [np.mean(i) for i in testX]
-        stdVar = [np.std(i)  for i in testX]
+        stdVar = [np.var(i)  for i in testX]
         for i in range(len(testX)):
             # use trainSet mean std or testSet mean std
             # testX[i] = (testX[i]- self.mean[i]) / self.stdVar[i]
@@ -180,14 +179,9 @@ def AritificialNeuralNetworksModelMain():
     train, trainy, test, testy = tl.createDataSet()
     # layers, learningRate, trainX, trainY, testX, testY, epoch
     ANNModel = AritificialNeuralNetworks(layers=[4, 150, 4], learningRate=0.1, trainX=train,\
-                                         trainY=trainy, testX=test, testY=testy, epoch = 600)
+                                         trainY=trainy, testX=test, testY=testy, epoch = 500)
     # fit the model with training data
-    # clock time 
-    import time
-    start = time.clock()
     ANNModel.fitTransform()
-    end   = time.clock()
-    print ("Training time : " + str(end - start) + "s")
     # cal the accuracy
     accuracy = ANNModel.prediction(testX=test, testY=testy)[0]
     print ("The accuracy of the test dataSet :  " + str(accuracy))
