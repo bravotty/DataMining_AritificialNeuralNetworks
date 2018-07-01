@@ -55,7 +55,7 @@ AritificialNeuralNetworks.py
   |--Initial params struct
   |--FitTransform Function
   |--ForwardUpdate Function
-  |--backForwardUpdate Function
+  |--BackForwardUpdate Function
   |--/* Activation function 
   		sigmoid - sigmoidPrime
   		tanh    - tanhPrime
