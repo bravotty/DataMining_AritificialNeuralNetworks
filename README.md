@@ -52,10 +52,23 @@ class AritificialNeuralNetworks(object):
 ## Code Flie  :
 ```lisp
 AritificialNeuralNetworks.py
-  |--
+  |--Initial params struct
+  |--FitTransform Function
+  |--ForwardUpdate Function
+  |--backForwardUpdate Function
+  |--/* Activation function 
+  		sigmoid - sigmoidPrime
+  		tanh    - tanhPrime
+  		ReLU    - ReLUPrime
+  |--*/
+  |--Cost Function
+  |--Normalization Function
+  |--OneHotDataProcessing Function
+  |--Prediction Function
+  |--Main
 
 tools.py 
-  |--CreateDataSet Funtion
+  |--CreateDataSet Function
 ```
 
 ## License
