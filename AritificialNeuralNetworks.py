@@ -155,6 +155,7 @@ class AritificialNeuralNetworks(object):
         result = []
         testX = np.array(testX).T
         # print (self.mean)
+        # cal the test data and stdValue
         mean   = [np.mean(i) for i in testX]
         stdVar = [np.std(i)  for i in testX]
         for i in range(len(testX)):
