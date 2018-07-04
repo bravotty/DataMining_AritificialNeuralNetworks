@@ -182,10 +182,10 @@ def AritificialNeuralNetworksModelMain():
     # layers, learningRate, trainX, trainY, testX, testY, epoch
     ANNModel = AritificialNeuralNetworks(layers=[4, 150, 4], learningRate=0.1, trainX=train,\
                                          trainY=trainy, testX=test, testY=testy, epoch = 600)
-    # fit the model with training data
     # clock time 
     import time
     start = time.clock()
+    # fit the model with training data
     ANNModel.fitTransform()
     end   = time.clock()
     print ("Training time : " + str(end - start) + "s")
